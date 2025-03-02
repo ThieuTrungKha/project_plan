@@ -15,6 +15,8 @@ import RowComponent from '../../components/RowComponent';
 import SectionCOmponent from '../../components/SectionComponent';
 import SocialLogin from './components/SocialLogin';
 import LoginScreens from './LoginScreens';
+import LoadingModal from '../../modals/LoadingModal';
+import authenticationApi from '../../apis/authApi';
 
 const initValue = {
   username: '',
@@ -23,11 +25,36 @@ const initValue = {
   confirmPassword: ''
 }
 const SignUpScreens = ({navigation}:any) => {
-  const [values, setValues] = useState(initValue);
+  const [values, setValues] = useState(initValue)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
 const handleChangeValue = (key:string, value:string) =>{
   const data: any = {...values}
   data[`${key}`] = value
   setValues(data)
+}
+const handleSignUp = async () => {
+  const { email, password, confirmPassword} = values
+ if (email && password && confirmPassword) {
+  try {
+    const res = await authenticationApi.HandleAuthentication('/register', 
+      {
+        username: values.username,
+        email: values.email,
+        password: values.password
+      }, 
+      'post')
+    console.log(res);
+    setIsLoading(false)
+  } catch (error) {
+    console.log(error)
+    setIsLoading(false)
+  }
+  
+ }else{
+    setErrorMessage('Please fill in all fields')
+ }
 }
   return (
     <ContainerComponent isImageBackground isScroll back  >
@@ -64,11 +91,13 @@ const handleChangeValue = (key:string, value:string) =>{
       allowClear
       affix={<Lock size={22} color={appColors.gray} />}
       />
-    
        </SectionComponent>
+       {
+          errorMessage ? <TextComponents text={errorMessage} color={'red'} size={12} styles={{textAlign: 'center'}}/> : null
+       }
        <SpaceComponent height={16}/>
        <SectionCOmponent>
-          <ButtonComponent text='SIGN UP' type='primary' />
+          <ButtonComponent text='SIGN UP' type='primary' onPress={handleSignUp}/>
        </SectionCOmponent>
        <SocialLogin/>
        <SectionCOmponent>
@@ -77,6 +106,7 @@ const handleChangeValue = (key:string, value:string) =>{
         <ButtonComponent text=' Sign in' type='link' onPress={()=>{navigation.navigate('LoginScreens')}} />
         </RowComponent>
        </SectionCOmponent>
+       <LoadingModal visible={isLoading}  />
     </ContainerComponent>
   )
 }
