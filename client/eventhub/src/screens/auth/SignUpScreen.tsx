@@ -17,6 +17,8 @@ import SocialLogin from './components/SocialLogin';
 import LoginScreens from './LoginScreens';
 import LoadingModal from '../../modals/LoadingModal';
 import authenticationApi from '../../apis/authApi';
+import { useDispatch } from 'react-redux';
+import { addAuth } from '../../redux/reducers/authReducer';
 
 const initValue = {
   username: '',
@@ -28,7 +30,7 @@ const SignUpScreens = ({navigation}:any) => {
   const [values, setValues] = useState(initValue)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-
+  const dispatch = useDispatch()
 const handleChangeValue = (key:string, value:string) =>{
   const data: any = {...values}
   data[`${key}`] = value
@@ -45,8 +47,8 @@ const handleSignUp = async () => {
         password: values.password
       }, 
       'post')
-    console.log(res);
-    setIsLoading(false)
+    dispatch(addAuth(res.data))
+    await AsyncStorage.setItem('auth', JSON.stringify(res.data))
   } catch (error) {
     console.log(error)
     setIsLoading(false)
