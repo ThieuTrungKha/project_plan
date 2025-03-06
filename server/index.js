@@ -13,7 +13,9 @@ const port = 3001;
 app.use(express.json());
 
 app.use('/auth', authRouter)
-
+app.get('/hello', (req, res) => {
+    res.send('Server is running!');
+});
 connectDB()
 app.use(errorMiddleHandler)
 

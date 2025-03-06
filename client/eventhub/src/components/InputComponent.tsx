@@ -15,10 +15,11 @@ interface Props {
     isPassword?: boolean,
     allowClear?: boolean,
     type?: string
+    onEnd?: () => void
 }
 
 const InputComponent = (props: Props) => {
-    const { value, onChange, affix, placeholder, suffix, isPassword, allowClear, type } = props
+    const { value, onChange, affix, placeholder, suffix, isPassword, allowClear, type, onEnd } = props
     const [isShowPass, setIsShowPass] =  useState(isPassword ?? false)
 
     return (
@@ -31,6 +32,7 @@ const InputComponent = (props: Props) => {
                 placeholder={placeholder ?? ''}
                 secureTextEntry={isShowPass}
                 placeholderTextColor={'#747688'}
+                onEndEditing={onEnd}
             />
             
             {suffix && suffix}

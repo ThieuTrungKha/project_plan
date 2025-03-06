@@ -9,7 +9,11 @@ const HomeScreens = () => {
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text>HomeScreens</Text>
-      <Button title='logout' onPress={async()=>{ dispatch(removeAuth({}))}}/>
+      <Button title='logout' onPress={async()=>{
+        await AsyncStorage.clear()
+        dispatch(removeAuth({}))
+      }
+       }/>
     </View>
   )
 }

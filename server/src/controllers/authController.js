@@ -4,8 +4,19 @@ const bcrypt = require('bcrypt')
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
+const nodemailer = require('nodemailer')
+require('dotenv').config()
+console.log('EMAIL_USER:', process.env.EMAIL_USER)
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+})
 const getJsonWebToken = (email, id) => {
-    console.log('====================================');
 
     const payload = {
         email,
@@ -17,10 +28,50 @@ const getJsonWebToken = (email, id) => {
 
     return token
 }
+const handleSendMail = async (val, email) => {
+
+    try {
+        await transporter.sendMail({
+            from: 'trungkha',
+            to: email,
+            subject: "Verify email",
+            text: "Your code to verification email",
+            html: `<h1>${val}</h1>`,
+        })
+    } catch (error) {
+        console.log('error:', error)
+
+    }
+
+}
+
+const verifycation = asyncHandler(async (req, res) => {
+
+    const { email, code } = req.body
+    const verifycationCode = Math.round(1000 + Math.random() * 9000)
+
+    try {
+        await handleSendMail(verifycationCode, email)
+        res.status(200).json({
+            message: 'Send email success',
+            data: {
+                code: verifycationCode
+            }
+        })
+
+    } catch (error) {
+        res.send(401).json({
+            message: 'Send email fail'
+        })
+
+    }
+})
 
 const register = asyncHandler(async (req, res) => {
 
     const { email, password, username } = req.body
+    console.log('email:', email)
+
     const existingUser = await UserModel.findOne({ email })
     if (existingUser) {
         res.status(401)
@@ -48,6 +99,36 @@ const register = asyncHandler(async (req, res) => {
 
 })
 
+const login = asyncHandler(async (req, res) => {
+    const { email, password } = req.body
+    const existingUser = await UserModel.findOne({ email })
+    if (!existingUser) {
+        res.status(403).json({
+            message: 'user not found'
+        })
+        throw new Error('User not found')
+    }
+    const isMatchPassword = await bcrypt.compare(password, existingUser.password)
+    console.log('isMatchPassword:', isMatchPassword)
+    if (!isMatchPassword) {
+        res.status(401).json({
+            message: 'Invalid password'
+        })
+        throw new Error('Email or password is incorrect')
+    }
+    res.status(200).json({
+        message: 'Login success',
+        data: {
+            email: existingUser.email,
+            username: existingUser.username,
+            accessstoken: await getJsonWebToken(email, existingUser.id)
+        }
+    })
+})
+
 module.exports = {
-    register
+    register,
+    login,
+    verifycation
+
 }
