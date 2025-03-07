@@ -7,6 +7,7 @@ import { ButtonComponent, SpaceComponent } from '../../../components';
 import { FacebookSvg, GoogleSvg } from '../../../assets/svgs';
 import { Facebook } from 'iconsax-react-native';
 const SocialLogin = () => {
+  const handleLoginWithGoogle = () => {}
   return (
    <SectionComponent>
     <TextComponents 
@@ -16,6 +17,7 @@ const SocialLogin = () => {
     />
     <SpaceComponent height={16}/>
     <ButtonComponent
+    onPress={handleLoginWithGoogle}
     text='Login in with Google'
     type='primary'
     color={appColors.white}

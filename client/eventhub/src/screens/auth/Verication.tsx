@@ -11,6 +11,9 @@ import RowComponent from "../../components/RowComponent";
 import { appColors } from "../../constants/appColor";
 import authenticationApi from "../../apis/authApi";
 import LoadingModal from "../../modals/LoadingModal";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addAuth } from "../../redux/reducers/authReducer";
 
 const Verication = ({ navigation, route }: any) => {
   const { code, email, password, username } = route.params;
@@ -27,7 +30,7 @@ const Verication = ({ navigation, route }: any) => {
   const ref2 = useRef<any>();
   const ref3 = useRef<any>();
   const ref4 = useRef<any>();
-
+  const dispacth = useDispatch();
   const handleChangeCode = (val: string, index: number) => {
     const data = [...codeValue];
     data[index] = val;
@@ -98,7 +101,8 @@ const Verication = ({ navigation, route }: any) => {
             data,
             "post",
           );
-          console.log(res);
+          dispacth(addAuth(res.data));
+          await AsyncStorage.setItem("auth", JSON.stringify(res.data));
         } catch (error) {
           console.log(`can not send verification code ${error}`);
         }

@@ -112,6 +112,7 @@ const SignUpScreens = ({ navigation }: any) => {
         username: values.username,
       });
     } catch (error) {
+      setErrorMessage("Email already exists");
       console.log("error:", error);
     }
 
@@ -177,13 +178,15 @@ const SignUpScreens = ({ navigation }: any) => {
       </SectionComponent>
       {errorMessage && (
         <SectionComponent>
-          {Object.keys(errorMessage).map((error, index) => (
-            <TextComponents
-              text={errorMessage[error]}
-              key={`error${index}`}
-              color="red"
-            />
-          ))}
+          <RowComponent>
+            {Object.keys(errorMessage).map((error, index) => (
+              <TextComponents
+                text={errorMessage[error]}
+                key={`error${index}`}
+                color="red"
+              />
+            ))}
+          </RowComponent>
         </SectionComponent>
       )}
       <SpaceComponent height={16} />

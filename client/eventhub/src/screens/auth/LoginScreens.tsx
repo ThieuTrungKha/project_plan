@@ -7,7 +7,7 @@ import {
   Switch,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ButtonComponent from "./../../components/ButtonComponent";
 import { globalStyles } from "./../../styles/globalStyle";
@@ -33,7 +33,19 @@ const LoginScreens = ({ navigation }: any) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRemember, setIsRemember] = useState(true);
+  const [isDisable, setIsDisable] = useState(true);
+
   const dispacth = useDispatch();
+
+  useEffect(() => {
+    const emailValidation = Validate.email(email);
+
+    if (!email || !password || !emailValidation) {
+      setIsDisable(true);
+    } else {
+      setIsDisable(false);
+    }
+  }, [email, password]);
 
   const handleLogin = async () => {
     const emailValidation = Validate.email(email);
@@ -113,6 +125,7 @@ const LoginScreens = ({ navigation }: any) => {
       <SpaceComponent height={16} />
       <SectionCOmponent>
         <ButtonComponent
+          disabled={isDisable}
           text="SIGN IN"
           type="primary"
           onPress={() => handleLogin()}

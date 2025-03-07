@@ -70,7 +70,6 @@ const verifycation = asyncHandler(async (req, res) => {
 const register = asyncHandler(async (req, res) => {
 
     const { email, password, username } = req.body
-    console.log('email:', email)
 
     const existingUser = await UserModel.findOne({ email })
     if (existingUser) {
@@ -126,9 +125,47 @@ const login = asyncHandler(async (req, res) => {
     })
 })
 
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body
+    const randomPassword = Math.round(100000 + Math.random() * 99000)
+
+    const user = await UserModel.findOne({ email })
+    console.log('user:', user)
+    if (user) {
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(randomPassword.toString(), salt)
+        await UserModel.findByIdAndUpdate(user._id, { password: hashedPassword })
+        try {
+            await transporter.sendMail({
+                from: 'trungkha',
+                to: email,
+                subject: "Verify password",
+                text: "Your code to verification password",
+                html: `<h1>${randomPassword}</h1>`,
+            })
+            res.status(200).json({
+                message: 'Send new password success',
+                data: []
+            })
+        } catch (error) {
+            console.log('error:', error)
+
+        }
+    } else {
+        res.status(401).json({
+            message: 'User not found'
+        })
+        throw new Error('User not found')
+    }
+
+
+})
+
+
 module.exports = {
     register,
     login,
-    verifycation
+    verifycation,
+    forgotPassword
 
 }
