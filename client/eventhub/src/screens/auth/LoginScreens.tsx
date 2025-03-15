@@ -10,7 +10,6 @@ import {
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ButtonComponent from "./../../components/ButtonComponent";
-import { globalStyles } from "./../../styles/globalStyle";
 import InputComponent from "./../../components/InputComponent";
 import { Sms, Lock } from "iconsax-react-native";
 import { appColors } from "../../constants/appColor";
@@ -22,8 +21,6 @@ import { useHandler } from "react-native-reanimated";
 import RowComponent from "./../../components/RowComponent";
 import SectionCOmponent from "./../../components/SectionComponent";
 import SocialLogin from "./components/SocialLogin";
-import SignUpScreens from "./SignUpScreen";
-import ForgotPassword from "./ForgotPassword";
 import authenticationApi from "../../apis/authApi";
 import { Validate } from "../../utils/Validate";
 import { useDispatch } from "react-redux";

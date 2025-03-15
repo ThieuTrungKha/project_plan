@@ -1,8 +1,9 @@
 export const appColors = {
-    primary: '#5669FF',
-    white: '#fff',
-    textColor: '#120D26',
-    iconColor: '#807A7A',
-    boderColor: '#DADADA',
-    gray: '#807A7A'
-}
+  primary: "#007AFF",
+  white: "#fff",
+  textColor: "#333333",
+  iconColor: "#807A7A",
+  boderColor: "#DADADA",
+  gray: "#807A7A",
+  highlight: "#f1c40f",
+};

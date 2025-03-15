@@ -115,27 +115,6 @@ const SignUpScreens = ({ navigation }: any) => {
       setErrorMessage("Email already exists");
       console.log("error:", error);
     }
-
-    // const { email, password, confirmPassword } = values;
-    // if (email && password && confirmPassword) {
-    //   try {
-    //     const res = await authenticationApi.HandleAuthentication(
-    //       "/register",
-    //       {
-    //         username: values.username,
-    //         email: values.email,
-    //         password: values.password,
-    //       },
-    //       "post",
-    //     );
-    //     dispatch(addAuth(res.data));
-    //     await AsyncStorage.setItem("auth", JSON.stringify(res.data));
-    //   } catch (error) {
-    //     console.log(error);
-    //     setIsLoading(false);
-    //   }
-    // } else {
-    // }
   };
   return (
     <ContainerComponent isImageBackground isScroll back>

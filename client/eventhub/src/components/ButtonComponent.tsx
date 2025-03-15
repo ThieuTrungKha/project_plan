@@ -5,11 +5,14 @@ import {
   ViewStyle,
   TextComponent,
   TouchableOpacity,
+  TextStyle,
 } from "react-native";
 import React, { ReactNode } from "react";
 import TextComponents from "./TextComponents";
 import { globalStyles } from "../styles/globalStyle";
 import { appColors } from "../constants/appColor";
+import { Home2 } from "iconsax-react-native";
+import RowComponent from "./RowComponent";
 interface Props {
   icon?: ReactNode;
   text: string;
@@ -17,10 +20,12 @@ interface Props {
   color?: string;
   styles?: StyleProp<ViewStyle>;
   textColor?: string;
-  textStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   onPress?: () => void;
   iconFlex?: "right" | "left";
   disabled?: boolean;
+  iconLeft?: ReactNode;
+  iconRight?: ReactNode;
 }
 const ButtonComponent = (props: Props) => {
   const {
@@ -34,6 +39,8 @@ const ButtonComponent = (props: Props) => {
     iconFlex,
     textStyle,
     disabled,
+    iconLeft,
+    iconRight,
   } = props;
   return type === "primary" ? (
     <TouchableOpacity
@@ -69,11 +76,37 @@ const ButtonComponent = (props: Props) => {
       />
       {icon && iconFlex === "right" && icon}
     </TouchableOpacity>
+  ) : type === "text" ? (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingBottom: 5,
+          paddingTop: 10,
+          marginTop: 5,
+        },
+        styles,
+      ]}
+    >
+      <RowComponent>
+        {iconLeft && iconLeft}
+        <TextComponents
+          text={text}
+          color={textColor}
+          styles={[{ flex: 0, textAlign: "center" }, textStyle]}
+        />
+      </RowComponent>
+      {iconRight && iconRight}
+    </TouchableOpacity>
   ) : (
     <TouchableOpacity onPress={onPress}>
       <TextComponents
         text={text}
-        color={type === "link" ? appColors.primary : appColors.textColor}
+        color={type === "link" ? appColors.primary : textColor}
+        styles={textStyle}
       />
     </TouchableOpacity>
   );
