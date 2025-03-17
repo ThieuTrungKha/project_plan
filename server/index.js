@@ -6,6 +6,7 @@ const cors = require('cors');
 const authRouter = require('./src/routers/authRouter');
 const connectDB = require('./src/config/connectdb');
 const errorMiddleHandler = require('./middlewares/errorMiddleware');
+const planRoute = require('./src/routers/planRoute');
 const app = express();
 app.use(cors());
 
@@ -13,6 +14,8 @@ const port = 3001;
 app.use(express.json());
 
 app.use('/auth', authRouter)
+app.use('/plan', planRoute)
+
 app.get('/hello', (req, res) => {
     res.send('Server is running!');
 });

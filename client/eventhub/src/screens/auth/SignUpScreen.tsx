@@ -39,7 +39,6 @@ const SignUpScreens = ({ navigation }: any) => {
   const [errorMessage, setErrorMessage] = useState<any>();
   const [isDisabled, setIsDisabled] = useState(true);
 
-  const dispatch = useDispatch();
   useEffect(() => {
     if (
       !errorMessage ||

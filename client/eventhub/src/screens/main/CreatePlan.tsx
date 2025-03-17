@@ -5,7 +5,7 @@ import {
   Touchable,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { appColors } from "./../../constants/appColor";
 import { appInfo } from "../../constants/appInfo";
 import {
@@ -15,25 +15,64 @@ import {
   TextComponents,
 } from "../../components";
 import RowComponent from "../../components/RowComponent";
-import { CloseCircle } from "iconsax-react-native";
+import { CloseCircle, Key } from "iconsax-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import SectionCOmponent from "../../components/SectionComponent";
 import { TextInput } from "react-native-gesture-handler";
+import PlanApiService from "../../apis/planApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-const CreatePlan = () => {
+const CreatePlan = ({ navigation }: any) => {
   const [infoPlan, setInfoPlan] = useState("");
   const [infoComment, setInfoComment] = useState("");
+  const [selectColor, setSelectColor] = useState(appColors.primary);
+  const [isDisabled, setiIsDisabled] = useState(true);
 
+  useEffect(() => {
+    if (infoPlan) {
+      setiIsDisabled(false);
+    } else {
+      setiIsDisabled(true);
+    }
+  }, [infoPlan]);
+
+  const valueColor = [
+    appColors.primary,
+    "#8BC34A", // Green
+    "#E91E63", // Pink
+    "#FFC107", // Amber
+    "#673AB7", // Deep Purple
+    "#009688", // Teal
+  ];
+  const handlePlan = async () => {
+    try {
+      const res = await PlanApiService.planService(
+        "/createPlan",
+        {
+          planName: infoPlan,
+          planDescription: infoComment,
+          photoUrlBackground: selectColor,
+        },
+        "post",
+      );
+      navigation.navigate("HomeScreens");
+      setInfoPlan("");
+      setInfoComment("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View style={{ backgroundColor: appColors.white, flex: 1 }}>
       <View
         style={{
-          backgroundColor: appColors.primary,
+          backgroundColor: selectColor,
           height: appInfo.sizes.HEIGHT * 0.15,
         }}
       >
         <RowComponent stylles={{ alignItems: "center" }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons
               name="close"
               size={32}
@@ -47,7 +86,7 @@ const CreatePlan = () => {
             size={24}
             styles={{
               marginTop: appInfo.sizes.HEIGHT * 0.09,
-              marginLeft: appInfo.sizes.HEIGHT * 0.05,
+              marginLeft: appInfo.sizes.HEIGHT * 0.04,
             }}
           />
         </RowComponent>
@@ -84,19 +123,32 @@ const CreatePlan = () => {
             marginBottom: 20,
           }}
         />
-        <RowComponent
-          stylles={{ justifyContent: "space-between", marginBottom: 50 }}
-        >
-          <TextComponents text="Phông nền kế hoạch" size={18} />
-          <View
-            style={{
-              backgroundColor: appColors.primary,
-              height: 40,
-              width: 40,
-            }}
-          />
-        </RowComponent>
-        <ButtonComponent text="Tạo kế hoạch" type="primary" />
+
+        <TextComponents text="Phông nền kế hoạch" size={18} />
+        <View style={{ flexDirection: "row", marginVertical: 30 }}>
+          {valueColor.map((color) => {
+            return (
+              <TouchableOpacity
+                key={color}
+                style={{
+                  backgroundColor: color,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  marginRight: 10,
+                  marginBottom: 10,
+                }}
+                onPress={() => setSelectColor(color)}
+              />
+            );
+          })}
+        </View>
+        <ButtonComponent
+          disabled={isDisabled}
+          text="Tạo kế hoạch"
+          type="primary"
+          onPress={() => handlePlan()}
+        />
       </SectionCOmponent>
     </View>
   );

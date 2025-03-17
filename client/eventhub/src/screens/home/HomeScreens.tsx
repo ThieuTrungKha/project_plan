@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { removeAuth } from "../../redux/reducers/authReducer";
-const TrelloSampleScreen = () => {
+const TrelloSampleScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView
       style={[styles.container, { paddingTop: StatusBar.currentHeight }]}
@@ -97,7 +97,10 @@ const TrelloSampleScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.floatingButton}>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate("CreatePlan")}
+      >
         <Ionicons name="add" size={24} color="white" />
         <Text style={styles.buttonText}>Tạo kế hoạch</Text>
       </TouchableOpacity>

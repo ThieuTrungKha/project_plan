@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const nodemailer = require('nodemailer')
 require('dotenv').config()
-console.log('EMAIL_USER:', process.env.EMAIL_USER)
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -23,7 +22,6 @@ const getJsonWebToken = (email, id) => {
         id
     }
 
-    console.log("JWT_SECRET:", process.env.SECRET_KEY);
     const token = jwt.sign(payload, process.env.SECRET_KEY)
 
     return token

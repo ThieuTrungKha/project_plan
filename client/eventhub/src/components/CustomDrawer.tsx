@@ -55,7 +55,7 @@ const CustomDrawer = (props: any) => {
         <SectionCOmponent
           styles={{
             backgroundColor: appColors.primary,
-            height: 150,
+            height: appInfo.sizes.HEIGHT * 0.2,
             marginTop: 0,
           }}
         >
@@ -77,15 +77,21 @@ const CustomDrawer = (props: any) => {
         </SectionCOmponent>
 
         <View style={{ backgroundColor: appColors.white, margin: 0 }}>
-          <TextComponents
-            text={"________________________________________________"}
-            color={appColors.boderColor}
-            styles={{ paddingBottom: 10 }}
+          <View
+            style={{
+              height: 0.5,
+              backgroundColor: appColors.boderColor,
+              width: "100%",
+            }}
           />
           <DrawerItemList {...props} />
-          <TextComponents
-            text={"________________________________________________"}
-            color={appColors.boderColor}
+          <View
+            style={{
+              height: 0.5,
+              backgroundColor: appColors.boderColor,
+              width: "100%",
+              marginBottom: 15,
+            }}
           />
           <SectionCOmponent>
             <TextComponents

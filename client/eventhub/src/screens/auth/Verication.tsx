@@ -101,6 +101,7 @@ const Verication = ({ navigation, route }: any) => {
             data,
             "post",
           );
+
           dispacth(addAuth(res.data));
           await AsyncStorage.setItem("auth", JSON.stringify(res.data));
         } catch (error) {

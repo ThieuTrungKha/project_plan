@@ -37,7 +37,6 @@ const DrawerNavigation = () => {
         name="HomeScreens"
         component={HomeScreens}
       />
-
       <Drawer.Screen
         options={{
           drawerLabel: "Detail Plan",
@@ -67,6 +66,11 @@ const DrawerNavigation = () => {
         }}
         name="DetailTask"
         component={DetailTask}
+      />
+      <Drawer.Screen
+        name="CreatePlan"
+        component={CreatePlan}
+        options={{ drawerItemStyle: { height: 0 }, headerShown: false }}
       />
       <Drawer.Screen
         options={{

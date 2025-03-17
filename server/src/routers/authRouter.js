@@ -7,4 +7,5 @@ authRouter.post('/login', login)
 authRouter.post('/verify', verifycation)
 authRouter.post('/forgotPassword', forgotPassword)
 
+
 module.exports = authRouter
