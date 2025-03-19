@@ -8,9 +8,9 @@ const connectDB = require('./src/config/connectdb');
 const errorMiddleHandler = require('./middlewares/errorMiddleware');
 const planRoute = require('./src/routers/planRoute');
 const app = express();
+const PORT = process.env.PORT || 5000;
 app.use(cors());
 
-const port = 3001;
 app.use(express.json());
 
 app.use('/auth', authRouter)
@@ -22,12 +22,12 @@ app.get('/hello', (req, res) => {
 connectDB()
 app.use(errorMiddleHandler)
 
-app.listen(port, (err) => {
+app.listen(PORT, '0.0.0.0', (err) => {
     if (err) {
         console.log('====================================');
         console.log(err);
         console.log('====================================');
         return
     }
-    console.log('Server is running on port http://localhost:' + port);
+    console.log('Server is running on port' + PORT);
 });

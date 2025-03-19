@@ -14,11 +14,9 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
-type DetailPlanScreenRouteProp = RouteProp<{ params: { plan: any } }, "params">;
-
 const DetailPlanScreen = () => {
-  const route = useRoute<DetailPlanScreenRouteProp>;
-  const plan = route.params?.plan;
+  const route = useRoute();
+  const plan = route.params;
   console.log(plan);
   const [checked, setChecked] = useState(false);
 
