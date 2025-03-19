@@ -12,10 +12,14 @@ import { autoBatchEnhancer } from "@reduxjs/toolkit";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
-<Ionicons name="time-outline" size={24} color="black" />;
+type DetailPlanScreenRouteProp = RouteProp<{ params: { plan: any } }, "params">;
 
 const DetailPlanScreen = () => {
+  const route = useRoute<DetailPlanScreenRouteProp>;
+  const plan = route.params?.plan;
+  console.log(plan);
   const [checked, setChecked] = useState(false);
 
   return (

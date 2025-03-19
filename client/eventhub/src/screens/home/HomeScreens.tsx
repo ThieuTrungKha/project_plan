@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   SafeAreaView,
   View,
@@ -13,7 +13,36 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { removeAuth } from "../../redux/reducers/authReducer";
+import { appColors } from "../../constants/appColor";
+import { TextComponents } from "../../components";
+import PlanApiService from "../../apis/planApi";
+import { useFocusEffect } from "@react-navigation/native";
+
+interface Plan {
+  _id: string;
+  planName: string;
+  planDescription: string;
+  photoUrlBackground: string;
+}
+
 const TrelloSampleScreen = ({ navigation }: any) => {
+  const [planData, setPlanData] = useState<Plan[]>([]);
+
+  const getDataPlan = async () => {
+    try {
+      const res = await PlanApiService.planService("/getPlan");
+      setPlanData(res.data);
+    } catch (error) {
+      console.log("error getting plan list", error);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      getDataPlan();
+      return () => {};
+    }, []),
+  );
+
   return (
     <SafeAreaView
       style={[styles.container, { paddingTop: StatusBar.currentHeight }]}
@@ -37,64 +66,40 @@ const TrelloSampleScreen = ({ navigation }: any) => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Các bảng không gian làm việc của bạnsssssssssssssssssssssssssssss
+          Các bảng không gian làm việc của bạn
         </Text>
 
         <View style={styles.boardContainer}>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#857DCA" }]}
-          >
-            <Text
-              style={styles.boardItemText}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+          {planData.map((plan) => (
+            <TouchableOpacity
+              key={plan._id}
+              style={[
+                styles.boardItem,
+                { backgroundColor: plan.photoUrlBackground },
+              ]}
+              onPress={() => {
+                navigation.navigate("DetailPlanScreen", { id: plan._id });
+              }}
             >
-              akkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#F48FB1" }]}
-          >
-            <Text style={styles.boardItemText}>Bảng Trello của tôi</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#C5E1A5" }]}
-          >
-            <Text style={styles.boardItemText}>Dự án phần mềm web...</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.boardItem, { backgroundColor: "#80DEEA" }]}
-          >
-            <Text style={styles.boardItemText}>Kế hoạch 2</Text>
-          </TouchableOpacity>
+              <TextComponents
+                text={plan.planName}
+                color={appColors.white}
+                styles={{ padding: 5, fontWeight: "600" }}
+              />
+              <View
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                  width: "100%",
+                  height: "60%",
+                  padding: 5,
+                }}
+              >
+                <Text style={{ color: appColors.white }}>
+                  {plan.planDescription}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
       <TouchableOpacity
@@ -181,8 +186,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 8,
     marginBottom: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "space-between",
   },
   boardItemText: {
     color: "#FFF",

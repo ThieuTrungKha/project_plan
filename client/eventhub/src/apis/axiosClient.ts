@@ -9,14 +9,11 @@ axiosClient.interceptors.request.use(async (config: any) => {
   const tokenData = await AsyncStorage.getItem("auth");
 
   if (!tokenData) {
-    console.error("Token không tồn tại");
-    return;
+    return config;
   }
 
   const parsedData = JSON.parse(tokenData);
   const accessToken = parsedData.accessstoken;
-
-  console.log("Token gửi đi:", accessToken);
 
   console.log("Token gửi đi:", accessToken);
 
