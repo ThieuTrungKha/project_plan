@@ -19,7 +19,7 @@ import { CloseCircle, Key } from "iconsax-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import SectionCOmponent from "../../components/SectionComponent";
 import { TextInput } from "react-native-gesture-handler";
-import PlanApiService from "../../apis/planApi";
+import PlanApiService from "../../apis/service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
@@ -47,8 +47,8 @@ const CreatePlan = ({ navigation }: any) => {
   ];
   const handlePlan = async () => {
     try {
-      const res = await PlanApiService.planService(
-        "/createPlan",
+      const res = await PlanApiService.service(
+        "/plan/createPlan",
         {
           planName: infoPlan,
           planDescription: infoComment,

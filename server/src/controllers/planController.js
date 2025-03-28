@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const planModel = require('../model/planModel')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { createData, getData } = require('../service/crudService');
 
 const secretkey = process.env.SECRET_KEY
 
@@ -22,34 +23,16 @@ const authenticateJWT = (req, res, next) => {
 };
 
 const createPlan = asyncHandler(async (req, res) => {
-    try {
-        const planData = {
-            ...req.body,
-            idUser: req.user.id
-        }
-        const newPlanData = new planModel(planData)
-        const savePlan = await newPlanData.save()
-        res.status(200).json({
-            message: 'Create plan success',
-            data: savePlan
-        })
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating plan' })
+    const planData = {
+        ...req.body,
+        idUser: req.user.id
     }
-
+    await createData(planData, planModel, 'Create plan success', 'Create plan failed', res)
 })
 
 
 const getPlan = asyncHandler(async (req, res) => {
-    try {
-        const listPlanData = await planModel.find({ idUser: req.user.id })
-        res.status(200).json({
-            message: 'Get plan success',
-            data: listPlanData
-        })
-    } catch (error) {
-
-    }
+    getData('idUser', req.user.id, planModel, 'Get plan success', 'Get plan failed', res)
 })
 
 

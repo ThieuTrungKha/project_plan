@@ -2,7 +2,9 @@ const { default: mongoose } = require('mongoose')
 
 const PlanSchema = new mongoose.Schema({
     planName: {
-        type: String
+        type: String,
+        required: true
+
     },
     planDescription: {
         type: String

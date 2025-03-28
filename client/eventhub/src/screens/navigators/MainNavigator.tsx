@@ -6,6 +6,9 @@ import DrawerNavigation from "./DrawerNavigation";
 import HomeScreens from "../home/HomeScreens";
 import LoginScreens from "../auth/LoginScreens";
 import CreatePlan from "../main/CreatePlan";
+import DetailPlanScreen from "../main/DetailPlanScreen";
+import DetailTask from "./../main/DetailTask";
+import UpdateTask from "../main/UpdateTask";
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -14,6 +17,9 @@ const MainNavigator = () => {
       <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
       <Stack.Screen name="HomeScreens" component={HomeScreens} />
       <Stack.Screen name="CreatePlan" component={CreatePlan} />
+      <Stack.Screen name="DetailPlanScreen" component={DetailPlanScreen} />
+      <Stack.Screen name="DetailTask" component={DetailTask} />
+      <Stack.Screen name="UpdateTask" component={UpdateTask} />
     </Stack.Navigator>
   );
 };

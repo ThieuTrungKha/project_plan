@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import queryString from "query-string";
+
 const axiosClient = axios.create({
   paramsSerializer: (params) => queryString.stringify(params),
 });
@@ -14,8 +15,6 @@ axiosClient.interceptors.request.use(async (config: any) => {
 
   const parsedData = JSON.parse(tokenData);
   const accessToken = parsedData.accessstoken;
-
-  console.log("Token gửi đi:", accessToken);
 
   config.headers = {
     Authorization: accessToken ? `Bearer ${accessToken}` : "",
@@ -34,6 +33,9 @@ axiosClient.interceptors.response.use(
     throw new Error("Error");
   },
   (err) => {
+    if (axios.isCancel(err)) {
+      return Promise.reject({ canceled: true });
+    }
     console.log(`Error api ${JSON.stringify(err)}`);
     throw new Error(err.response);
   },

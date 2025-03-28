@@ -37,14 +37,13 @@ const DrawerNavigation = () => {
         name="HomeScreens"
         component={HomeScreens}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         options={{
           drawerLabel: "Detail Plan",
           headerShown: false,
           headerTitle: "Tạo Kế hoạch",
           headerTintColor: appColors.primary,
           drawerActiveTintColor: appColors.primary,
-
           drawerIcon: () => {
             return <Home2 size={22} color={appColors.gray} />;
           },
@@ -66,12 +65,12 @@ const DrawerNavigation = () => {
         }}
         name="DetailTask"
         component={DetailTask}
-      />
-      <Drawer.Screen
+      /> */}
+      {/* <Drawer.Screen
         name="CreatePlan"
         component={CreatePlan}
         options={{ drawerItemStyle: { height: 0 }, headerShown: false }}
-      />
+      /> */}
       <Drawer.Screen
         options={{
           drawerLabel: "test code",

@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 import { removeAuth } from "../../redux/reducers/authReducer";
 import { appColors } from "../../constants/appColor";
 import { TextComponents } from "../../components";
-import PlanApiService from "../../apis/planApi";
+import PlanApiService from "../../apis/service";
 import { useFocusEffect } from "@react-navigation/native";
 
 interface Plan {
@@ -25,12 +25,12 @@ interface Plan {
   photoUrlBackground: string;
 }
 
-const TrelloSampleScreen = ({ navigation }: any) => {
+const HomeScreens = ({ navigation }: any) => {
   const [planData, setPlanData] = useState<Plan[]>([]);
 
   const getDataPlan = async () => {
     try {
-      const res = await PlanApiService.planService("/getPlan");
+      const res = await PlanApiService.service("/plan/getPlan");
       setPlanData(res.data);
     } catch (error) {
       console.log("error getting plan list", error);
@@ -78,7 +78,11 @@ const TrelloSampleScreen = ({ navigation }: any) => {
                 { backgroundColor: plan.photoUrlBackground },
               ]}
               onPress={() => {
-                navigation.navigate("DetailPlanScreen", { id: plan._id });
+                navigation.navigate("DetailPlanScreen", {
+                  id: plan._id,
+                  planName: plan.planName,
+                  photoUrlBackground: plan.photoUrlBackground,
+                });
               }}
             >
               <TextComponents
@@ -113,7 +117,7 @@ const TrelloSampleScreen = ({ navigation }: any) => {
   );
 };
 
-export default TrelloSampleScreen;
+export default HomeScreens;
 
 const styles = StyleSheet.create({
   container: {

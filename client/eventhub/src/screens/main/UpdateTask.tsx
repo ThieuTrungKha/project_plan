@@ -33,17 +33,19 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRoute } from "@react-navigation/native";
 import axiosClient from "../../apis/axiosClient";
 import ClientService from "../../apis/service";
+import * as FileSystem from "expo-file-system";
 
 interface Task {
   content: string;
   status: boolean;
 }
 
-const DetailTask = ({ navigation }: any) => {
-  console.log(navigation.getState());
-
+const UpdateTask = ({ navigation }: any) => {
   const route = useRoute();
-  const pramTask = route.params as { id: string };
+  const pramTask = route.params as any;
+
+  console.log(JSON.stringify(pramTask.task, null, 2));
+
   const [selectColor, setSelectColor] = useState(appColors.primary);
   const [disablesubTask, setdisablesubTask] = useState(true);
   const [disableNote, setdisableNote] = useState(true);
@@ -73,6 +75,18 @@ const DetailTask = ({ navigation }: any) => {
   } | null>(null);
 
   const valueColor = appInfo.listColor;
+  useEffect(() => {
+    pramTask.task.backgroundUri && setImage(pramTask.task.backgroundUri);
+    pramTask.task.headerColor && setSelectColor(pramTask.task.headerColor);
+    pramTask.task.taskInfo && setTaskName(pramTask.task.taskInfo);
+    pramTask.task.taskDescription &&
+      setDescrible(pramTask.task.taskDescription);
+    pramTask.task.deadline && setDate(new Date(pramTask.task.deadline));
+    pramTask.task.file && fecthFile(pramTask.task.file);
+    pramTask.task.subTask && setsubTaskList(pramTask.task.subTask);
+    pramTask.task.note && setnoteList(pramTask.task.note);
+    pramTask.task.statusTask && setChecked(pramTask.task.statusTask);
+  }, []);
 
   useEffect(() => {
     setdisablesubTask(!subTask);
@@ -80,10 +94,10 @@ const DetailTask = ({ navigation }: any) => {
     setdisableTask(!taskName);
   }, [subTask, noteValue, taskName]);
 
-  const handleCreateTask = async () => {
+  const updateTask = async () => {
     try {
-      const res = await ClientService.service(
-        "/task/createTask",
+      await ClientService.service(
+        `/task/updateTask?taskId=${pramTask.task._id}`,
         {
           backgroundUri: image,
           headerColor: selectColor,
@@ -93,17 +107,28 @@ const DetailTask = ({ navigation }: any) => {
           file: file?.uri,
           subTask: subTaskList,
           note: noteList,
-          statusTask: checked,
-          listPlanId: pramTask.id,
         },
-        "post",
+        "patch",
       );
-      if (res) {
-        Alert.alert("Tạo nhiệm vụ thành công");
-        navigation.goBack();
+      Alert.alert("Cập nhật nhiệm vụ thành công");
+      navigation.goBack();
+    } catch (error) {
+      console.log("lỗi cập nhật nhiệm vụ", error);
+    }
+  };
+
+  const fecthFile = async (uri: string) => {
+    try {
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      if (fileInfo.exists) {
+        setFile({
+          uri,
+          name: fileInfo.uri.split("/").pop(),
+          size: fileInfo.size,
+        });
       }
     } catch (error) {
-      console.log(error);
+      console.log("lỗi lấy file", error);
     }
   };
 
@@ -413,7 +438,9 @@ const DetailTask = ({ navigation }: any) => {
                 <RowComponent
                   justify="space-between"
                   align="center"
-                  stylles={{}}
+                  stylles={{
+                    flex: 1,
+                  }}
                 >
                   <TouchableOpacity onPress={openFile}>
                     <View style={{ flex: 1, width: "90%" }}>
@@ -429,11 +456,13 @@ const DetailTask = ({ navigation }: any) => {
                     </View>
                   </TouchableOpacity>
 
-                  <Icon1
-                    name="more-vert"
-                    size={24}
-                    color={appColors.iconColor}
-                  />
+                  <TouchableOpacity>
+                    <Icon1
+                      name="more-vert"
+                      size={24}
+                      color={appColors.iconColor}
+                    />
+                  </TouchableOpacity>
                 </RowComponent>
               </>
             )}
@@ -644,8 +673,8 @@ const DetailTask = ({ navigation }: any) => {
             })}
             {/* lưu tất cả thông tin nhiệm vụ */}
             <TouchableOpacity
+              onPress={updateTask}
               disabled={disableTask}
-              onPress={handleCreateTask}
               style={{
                 alignItems: "center",
                 justifyContent: "center",
@@ -657,11 +686,11 @@ const DetailTask = ({ navigation }: any) => {
                 marginBottom: 100,
                 marginTop: 40,
                 width: "100%",
-                height: appInfo.sizes.HEIGHT * 0.05,
+                height: appInfo.sizes.HEIGHT * 0.06,
               }}
             >
               <TextComponents
-                text="Lưu"
+                text="Cập nhật nhiệm vụ"
                 color={appColors.white}
                 styles={{ fontWeight: 500 }}
               />
@@ -777,7 +806,7 @@ const DetailTask = ({ navigation }: any) => {
   );
 };
 
-export default DetailTask;
+export default UpdateTask;
 
 const styles = StyleSheet.create({
   overlay: {
