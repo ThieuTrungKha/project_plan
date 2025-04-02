@@ -110,7 +110,6 @@ const DetailPlanScreen = ({ navigation }: any) => {
         {
           planListName: listName,
           planListDescription: describe,
-          percentage: 0,
           background: selectColor,
           planId: paramPlan.id,
         },
@@ -124,13 +123,26 @@ const DetailPlanScreen = ({ navigation }: any) => {
     }
   };
   const getTask = async (id: string) => {
-    console.log(id);
     const res = await ClientService.service(
       `/task/getTask?taskId=${id}`,
       undefined,
       "get",
     );
     navigation.navigate("UpdateTask", { task: res.data });
+  };
+  const progress = (tasks: any) => {
+    if (!tasks || tasks.length === 0) return 0;
+    const totalTasks = tasks.length;
+    let number = 0;
+
+    tasks.forEach((task: any) => {
+      if (task.statusTask === true) {
+        number += 1;
+      }
+    });
+
+    const percentage = (number / totalTasks) * 100;
+    return percentage;
   };
 
   return (
@@ -166,7 +178,7 @@ const DetailPlanScreen = ({ navigation }: any) => {
             />
           </RowComponent>
           <RowComponent>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={progress}>
               <Icon
                 name="notifications"
                 size={24}
@@ -188,6 +200,7 @@ const DetailPlanScreen = ({ navigation }: any) => {
           const filteredTasks = tasks.filter(
             (task) => task.listPlanId === list._id,
           );
+          const percentComplete = progress(filteredTasks);
 
           return (
             <ScrollView
@@ -242,9 +255,18 @@ const DetailPlanScreen = ({ navigation }: any) => {
                       width: "80%",
                       height: appInfo.sizes.HEIGHT * 0.015,
                     }}
-                  />
+                  >
+                    <View
+                      style={{
+                        backgroundColor: paramPlan.photoUrlBackground, // Màu nền của thanh
+                        width: `${percentComplete}%`, // Chiều rộng theo phần trăm
+                        height: "100%",
+                        borderRadius: 10,
+                      }}
+                    />
+                  </View>
                   <TextComponents
-                    text={`${list.percentage}%`}
+                    text={`${percentComplete}%`}
                     size={16}
                     styles={{
                       paddingLeft: 10,
@@ -278,7 +300,6 @@ const DetailPlanScreen = ({ navigation }: any) => {
               {/* nhiệm vụ */}
               {filteredTasks.length > 0 ? (
                 filteredTasks.map((task) => {
-                  console.log(task.statusTask);
                   const completedSubTasks = task.subTask
                     ? task.subTask.filter(
                         (sub: any) => sub && sub.status === true,

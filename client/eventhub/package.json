@@ -34,7 +34,9 @@
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "@react-native-community/datetimepicker": "8.2.0",
-    "expo-file-system": "~18.0.12"
+    "expo-file-system": "~18.0.12",
+    "expo-notifications": "~0.29.14",
+    "expo-device": "~7.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

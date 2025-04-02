@@ -10,6 +10,7 @@ import CreatePlan from "../main/CreatePlan";
 import DetailPlanScreen from "../main/DetailPlanScreen";
 import testCode from "../main/testCode";
 import DetailTask from "../main/DetailTask";
+import UpdateInfoUser from "../main/UpdateInfoUser";
 
 const DrawerNavigation = () => {
   const Drawer = createDrawerNavigator();
@@ -74,7 +75,7 @@ const DrawerNavigation = () => {
       <Drawer.Screen
         options={{
           drawerLabel: "test code",
-          headerShown: false,
+          headerShown: true,
           headerTitle: "test code",
           headerTintColor: appColors.primary,
           drawerActiveTintColor: appColors.primary,
@@ -85,6 +86,16 @@ const DrawerNavigation = () => {
         }}
         name="testCode"
         component={testCode}
+      />
+      <Drawer.Screen
+        options={{
+          headerShown: true,
+          drawerItemStyle: { height: 0 },
+          headerTintColor: appColors.primary,
+          headerTitle: "Cập nhật thông tin cá nhân",
+        }}
+        name="UpdateInfoUser"
+        component={UpdateInfoUser}
       />
     </Drawer.Navigator>
   );

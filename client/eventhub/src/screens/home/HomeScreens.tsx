@@ -17,16 +17,20 @@ import { appColors } from "../../constants/appColor";
 import { TextComponents } from "../../components";
 import PlanApiService from "../../apis/service";
 import { useFocusEffect } from "@react-navigation/native";
+import RowComponent from "../../components/RowComponent";
+import IconMertial from "react-native-vector-icons/MaterialIcons";
 
 interface Plan {
   _id: string;
   planName: string;
   planDescription: string;
   photoUrlBackground: string;
+  statusPlan: boolean;
 }
 
 const HomeScreens = ({ navigation }: any) => {
   const [planData, setPlanData] = useState<Plan[]>([]);
+  const [reload, setReload] = useState<any>(null);
 
   const getDataPlan = async () => {
     try {
@@ -36,9 +40,24 @@ const HomeScreens = ({ navigation }: any) => {
       console.log("error getting plan list", error);
     }
   };
+
+  const checkPlan = async () => {
+    try {
+      const res = await PlanApiService.service("/plan/checkPlan");
+      setReload(res);
+    } catch (error) {
+      console.log("error check plan", error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      getDataPlan();
+      const checkData = async () => {
+        await checkPlan();
+        await getDataPlan();
+      };
+      checkData();
+
       return () => {};
     }, []),
   );
@@ -85,11 +104,26 @@ const HomeScreens = ({ navigation }: any) => {
                 });
               }}
             >
-              <TextComponents
-                text={plan.planName}
-                color={appColors.white}
-                styles={{ padding: 5, fontWeight: "600" }}
-              />
+              <RowComponent
+                align="center"
+                justify="space-between"
+                stylles={{ paddingRight: 5 }}
+              >
+                <TextComponents
+                  text={plan.planName}
+                  color={appColors.white}
+                  styles={{ padding: 5, fontWeight: "600" }}
+                />
+                {plan.statusPlan ? (
+                  <IconMertial name="check-box" size={24} color="white" />
+                ) : (
+                  <IconMertial
+                    name="check-box-outline-blank"
+                    size={24}
+                    color="white"
+                  />
+                )}
+              </RowComponent>
               <View
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.3)",

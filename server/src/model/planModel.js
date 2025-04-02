@@ -12,6 +12,11 @@ const PlanSchema = new mongoose.Schema({
     photoUrlBackground: {
         type: String
     },
+    statusPlan: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     idUser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',

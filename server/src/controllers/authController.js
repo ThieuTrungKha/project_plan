@@ -106,7 +106,6 @@ const login = asyncHandler(async (req, res) => {
         throw new Error('User not found')
     }
     const isMatchPassword = await bcrypt.compare(password, existingUser.password)
-    console.log('isMatchPassword:', isMatchPassword)
     if (!isMatchPassword) {
         res.status(401).json({
             message: 'Invalid password'
@@ -159,11 +158,33 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 })
 
+const verifyPassword = asyncHandler(async (req, res) => {
+    const userInfo = await UserModel.findById(req.user.id)
+    if (!userInfo) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    const isMatchPass = await bcrypt.compare(req.body.password, userInfo.password)
+
+    if (!isMatchPass) {
+        res.status(401).json({
+            message: 'incorrect'
+        })
+        throw new Error('Password is incorrect')
+    } else {
+        res.status(200).json({
+            message: 'correct',
+            data: []
+        })
+    }
+
+})
+
 
 module.exports = {
     register,
     login,
     verifycation,
-    forgotPassword
+    forgotPassword,
+    verifyPassword
 
 }

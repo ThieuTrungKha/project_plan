@@ -7,7 +7,7 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ButtonComponent from "./ButtonComponent";
 
 import {
@@ -38,15 +38,54 @@ import Icon1 from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { removeAuth } from "../redux/reducers/authReducer";
+import ClientService from "../apis/service";
+import { useFocusEffect } from "@react-navigation/native";
+import { ImageBackground } from "react-native";
+
+interface Plan {
+  statusPlan: boolean;
+  planName: string;
+}
+
+interface User {
+  username: string;
+  photoUrl?: string;
+  email: string;
+}
 
 const CustomDrawer = (props: any) => {
   const { navigation } = props;
   const [isClick, setIsClick] = useState(false);
+  const [planData, setPlanData] = useState<Plan[]>([]);
+  const [user, setUser] = useState<User>();
+  const [image, setImage] = useState<string | null>(null);
+
   const dispatch = useDispatch();
 
-  const handleClick = () => {
-    setIsClick((prev) => !prev);
+  const getListCompletedPlan = async () => {
+    const res = await ClientService.service("/plan/getPlan", undefined, "get");
+    setPlanData(res.data);
+    setImage(user?.photoUrl || "");
   };
+
+  const getDataUser = async () => {
+    const res = await ClientService.service("/user/getUser", undefined, "get");
+    setUser(res.data);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const timeout = setTimeout(() => {
+        getListCompletedPlan();
+      }, 2000);
+      getDataUser();
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }, []),
+  );
+
   return (
     <ScrollView style={{ flex: 1 }}>
       <SafeAreaView
@@ -59,21 +98,17 @@ const CustomDrawer = (props: any) => {
             marginTop: 0,
           }}
         >
-          <Image
-            source={require("../assets/img/image.png")}
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 100,
-              marginTop: 10,
-            }}
+          <ImageBackground
+            source={image ? { uri: image } : require("../assets/img/image.png")}
+            style={{ width: 50, height: 50, marginTop: 20 }}
+            imageStyle={{ borderRadius: 70 }}
           />
           <TextComponents
             styles={{ paddingTop: 10, fontWeight: 600, fontSize: 20 }}
-            text="kha"
+            text={user?.username || ""}
             color={appColors.white}
           />
-          <TextComponents text="kha@gmail.com" color={appColors.white} />
+          <TextComponents text={user?.email || ""} color={appColors.white} />
         </SectionCOmponent>
 
         <View style={{ backgroundColor: appColors.white, margin: 0 }}>
@@ -95,33 +130,34 @@ const CustomDrawer = (props: any) => {
           />
           <SectionCOmponent>
             <TextComponents
-              text="Danh sách kế hoạch đánh dấu sao"
+              text="Danh sách kế hoạch đã hoàn thành"
               color={appColors.textColor}
               styles={{ fontWeight: 700, fontSize: 16, paddingTop: 0 }}
             />
             <SpaceComponent height={5} />
-            <ButtonComponent
-              text="danh sách 1"
-              textStyle={{ fontSize: 18, paddingLeft: 10 }}
-              type="text"
-              iconLeft={<Star1 size={18} color={appColors.highlight} />}
-              iconRight={
-                <Icon name="more-vert" size={28} color={appColors.iconColor} />
+            {planData?.map((item: any, index: any) => {
+              if (item.statusPlan == true) {
+                return (
+                  <ButtonComponent
+                    key={index}
+                    text={item.planName}
+                    textStyle={{ fontSize: 18, paddingLeft: 10 }}
+                    type="text"
+                    iconLeft={<Star1 size={18} color={appColors.highlight} />}
+                    iconRight={
+                      <Icon
+                        name="more-vert"
+                        size={28}
+                        color={appColors.iconColor}
+                      />
+                    }
+                    textColor={
+                      isClick ? appColors.primary : appColors.textColor
+                    }
+                  />
+                );
               }
-              textColor={isClick ? appColors.primary : appColors.textColor}
-              onPress={() => navigation.navigate("LoginScreens")}
-            />
-            <ButtonComponent
-              text="danh sách 1"
-              textStyle={{ fontSize: 18, paddingLeft: 10 }}
-              type="text"
-              iconLeft={<Star1 size={18} color={appColors.highlight} />}
-              iconRight={
-                <Icon name="more-vert" size={28} color={appColors.iconColor} />
-              }
-              textColor={isClick ? appColors.primary : appColors.textColor}
-              onPress={() => handleClick()}
-            />
+            })}
           </SectionCOmponent>
         </View>
         <TextComponents
@@ -142,9 +178,14 @@ const CustomDrawer = (props: any) => {
               <Icon name="lock-reset" size={24} color={appColors.iconColor} />
             }
             textColor={isClick ? appColors.primary : appColors.textColor}
-            onPress={() => handleClick()}
+            onPress={() => {
+              navigation.navigate("ChangePassword");
+            }}
           />
           <ButtonComponent
+            onPress={() => {
+              navigation.navigate("UpdateInfoUser");
+            }}
             text="Đổi thông tin tài khoản"
             styles={{ justifyContent: "flex-start" }}
             textStyle={{ fontSize: 18, paddingLeft: 10 }}
@@ -157,7 +198,6 @@ const CustomDrawer = (props: any) => {
               />
             }
             textColor={isClick ? appColors.primary : appColors.textColor}
-            onPress={() => handleClick()}
           />
           <ButtonComponent
             text="Đăng xuất"

@@ -33,6 +33,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRoute } from "@react-navigation/native";
 import axiosClient from "../../apis/axiosClient";
 import ClientService from "../../apis/service";
+import { registerForPushNotificationsAsync } from "../../service/notificationService";
 
 interface Task {
   content: string;
@@ -40,8 +41,6 @@ interface Task {
 }
 
 const DetailTask = ({ navigation }: any) => {
-  console.log(navigation.getState());
-
   const route = useRoute();
   const pramTask = route.params as { id: string };
   const [selectColor, setSelectColor] = useState(appColors.primary);
@@ -57,7 +56,6 @@ const DetailTask = ({ navigation }: any) => {
   const [showSubTaskForm, setShowSubTaskForm] = useState(false);
   const [subTask, setSubTask] = useState("");
   const [statusSubTask, setStatusSubTask] = useState(false);
-
   const [subTaskList, setsubTaskList] = useState<Task[]>([]);
   const [checkBoxSubTask, setCheckBoxSubTask] = useState(false);
   const [noteValue, setNoteValue] = useState("");
@@ -66,6 +64,7 @@ const DetailTask = ({ navigation }: any) => {
   const [isShowDatePicker, setIsShowDatePicker] = useState(false);
   const [isShowTimePicker, setIsShowTimePicker] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [file, setFile] = useState<{
     uri: string;
     name?: string;
@@ -73,7 +72,25 @@ const DetailTask = ({ navigation }: any) => {
   } | null>(null);
 
   const valueColor = appInfo.listColor;
+  useEffect(() => {
+    async function getPushToken() {
+      console.log("🚀 Đang lấy Push Token...");
+      const token = await registerForPushNotificationsAsync();
 
+      if (token) {
+        setExpoPushToken(token);
+        console.log("Push Token lưu vào state:", token);
+      } else {
+        console.error("Không thể lấy được Push Token!");
+        Alert.alert(
+          "Lỗi",
+          "Không thể lấy Push Token. Hãy kiểm tra console để biết chi tiết.",
+        );
+      }
+    }
+
+    getPushToken();
+  }, []);
   useEffect(() => {
     setdisablesubTask(!subTask);
     setdisableNote(!noteValue);
@@ -95,6 +112,7 @@ const DetailTask = ({ navigation }: any) => {
           note: noteList,
           statusTask: checked,
           listPlanId: pramTask.id,
+          pushToken: expoPushToken,
         },
         "post",
       );

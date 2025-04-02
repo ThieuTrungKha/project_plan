@@ -9,6 +9,8 @@ import CreatePlan from "../main/CreatePlan";
 import DetailPlanScreen from "../main/DetailPlanScreen";
 import DetailTask from "./../main/DetailTask";
 import UpdateTask from "../main/UpdateTask";
+import ChangePassword from "../auth/ChangePassword";
+import NewPassword from "../auth/NewPassword";
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -20,6 +22,8 @@ const MainNavigator = () => {
       <Stack.Screen name="DetailPlanScreen" component={DetailPlanScreen} />
       <Stack.Screen name="DetailTask" component={DetailTask} />
       <Stack.Screen name="UpdateTask" component={UpdateTask} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
+      <Stack.Screen name="NewPassword" component={NewPassword} />
     </Stack.Navigator>
   );
 };

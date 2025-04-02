@@ -36,6 +36,13 @@ const TaskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'plans',
         required: true
+    },
+    pushToken: {
+        type: String,
+    },
+    sent: {
+        type: Boolean,
+        default: false
     }
 })
 

@@ -52,6 +52,7 @@ const updateDataById = async (id, newData, model, messageSuccess, messageErorr, 
         }
 
         const dataUpdated = await model.findByIdAndUpdate(id, newData, { new: true })
+        console.log('dataUpdated:', dataUpdated, '--', newData)
         res.status(200).json({
             message: messageSuccess,
             data: dataUpdated

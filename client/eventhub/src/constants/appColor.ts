@@ -6,4 +6,5 @@ export const appColors = {
   boderColor: "#DADADA",
   gray: "#807A7A",
   highlight: "#f1c40f",
+  gray1: "#E5E4E2",
 };

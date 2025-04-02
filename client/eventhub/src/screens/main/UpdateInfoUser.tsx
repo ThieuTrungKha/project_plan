@@ -1,21 +1,26 @@
-import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ImageBackground,
+} from "react-native";
 import React, { useEffect, useState } from "react";
+import { TextComponents } from "../../components";
 import { appColors } from "../../constants/appColor";
 import { appInfo } from "../../constants/appInfo";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import { ImageBackground } from "react-native";
-import { ButtonComponent, TextComponents } from "../../components";
-import { TextInput } from "react-native-gesture-handler";
 import ClientService from "../../apis/service";
+import { Alert } from "react-native";
 
 interface UserInfoProps {
   username: string;
   photoUrl?: string;
   email: string;
 }
-
-const testCode = () => {
+const UpdateInfoUser = ({ navigation }: any) => {
   const [image, setImage] = useState<string | null>(null);
   const [useInfo, setUseInfo] = useState<UserInfoProps>();
   const [userNameValue, setuserNameValue] = useState("");
@@ -38,7 +43,10 @@ const testCode = () => {
       },
       "patch",
     );
-    console.log(res.data);
+    if (res) {
+      Alert.alert("Cập nhật thành công");
+      navigation.navigate("HomeScreens");
+    }
   };
 
   const pickImage = async () => {
@@ -138,4 +146,4 @@ const testCode = () => {
   );
 };
 
-export default testCode;
+export default UpdateInfoUser;
