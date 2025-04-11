@@ -16,7 +16,7 @@ import { removeAuth } from "../../redux/reducers/authReducer";
 import { appColors } from "../../constants/appColor";
 import { TextComponents } from "../../components";
 import PlanApiService from "../../apis/service";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import RowComponent from "../../components/RowComponent";
 import IconMertial from "react-native-vector-icons/MaterialIcons";
 
@@ -27,6 +27,66 @@ interface Plan {
   photoUrlBackground: string;
   statusPlan: boolean;
 }
+interface Props {
+  planData: Plan[];
+  isMember: boolean;
+  navigation: any;
+}
+const ListPlan = ({ planData, isMember, navigation }: Props) => {
+  return (
+    <View style={styles.boardContainer}>
+      {planData.map((plan) => (
+        <TouchableOpacity
+          key={plan._id}
+          style={[
+            styles.boardItem,
+            { backgroundColor: plan.photoUrlBackground },
+          ]}
+          onPress={() => {
+            navigation.navigate("DetailPlanScreen", {
+              id: plan._id,
+              planName: plan.planName,
+              photoUrlBackground: plan.photoUrlBackground,
+            });
+          }}
+        >
+          <RowComponent
+            align="center"
+            justify="space-between"
+            stylles={{ paddingRight: 5 }}
+          >
+            <TextComponents
+              text={plan.planName}
+              color={appColors.white}
+              styles={{ padding: 5, fontWeight: "600" }}
+            />
+            {plan.statusPlan ? (
+              <IconMertial name="check-box" size={24} color="white" />
+            ) : (
+              <IconMertial
+                name="check-box-outline-blank"
+                size={24}
+                color="white"
+              />
+            )}
+          </RowComponent>
+          <View
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              width: "100%",
+              height: "60%",
+              padding: 5,
+            }}
+          >
+            <Text style={{ color: appColors.white }}>
+              {plan.planDescription}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
 const HomeScreens = ({ navigation }: any) => {
   const [planData, setPlanData] = useState<Plan[]>([]);
@@ -85,10 +145,24 @@ const HomeScreens = ({ navigation }: any) => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
+          Danh sách kế hoạch đã tham gia:
+        </Text>
+        {/* Danh sách kế hoạch đã tham gia */}
+        <View></View>
+
+        <Text
+          style={styles.sectionTitle}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Các bảng không gian làm việc của bạn
         </Text>
-
-        <View style={styles.boardContainer}>
+        <ListPlan
+          planData={planData}
+          navigation={navigation}
+          isMember={false}
+        />
+        {/* <View style={styles.boardContainer}>
           {planData.map((plan) => (
             <TouchableOpacity
               key={plan._id}
@@ -138,7 +212,7 @@ const HomeScreens = ({ navigation }: any) => {
               </View>
             </TouchableOpacity>
           ))}
-        </View>
+        </View> */}
       </ScrollView>
       <TouchableOpacity
         style={styles.floatingButton}

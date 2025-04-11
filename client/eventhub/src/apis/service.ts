@@ -8,14 +8,12 @@ class ApiService {
     method?: "get" | "post" | "put" | "delete" | "patch",
     signal?: AbortSignal,
   ) => {
-    console.log("service has been called", url);
     const res = await axiosClient(`${appInfo.BASE_URL}${url}`, {
       method: method ?? "get",
       data,
       signal,
     });
     return res;
-    console.log("check");
   };
 }
 

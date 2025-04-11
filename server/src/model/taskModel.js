@@ -43,6 +43,10 @@ const TaskSchema = new mongoose.Schema({
     sent: {
         type: Boolean,
         default: false
+    },
+    memberTask: {
+        type: [String],
+        default: []
     }
 })
 

@@ -11,8 +11,10 @@ import DetailPlanScreen from "../main/DetailPlanScreen";
 import testCode from "../main/testCode";
 import DetailTask from "../main/DetailTask";
 import UpdateInfoUser from "../main/UpdateInfoUser";
+import Icon from "react-native-vector-icons/Ionicons";
+import { appInfo } from "../../constants/appInfo";
 
-const DrawerNavigation = () => {
+const DrawerNavigation = ({ navigation }: any) => {
   const Drawer = createDrawerNavigator();
 
   return (
@@ -27,7 +29,29 @@ const DrawerNavigation = () => {
       <Drawer.Screen
         options={{
           drawerLabel: "Home",
-          headerTitle: "Kế hoạch",
+          headerTitle: () => (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  color: appColors.primary,
+                }}
+              >
+                Kế hoạch
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("NotificationScreen")}
+              >
+                <Icon
+                  name="notifications"
+                  size={24}
+                  color={appColors.primary}
+                  style={{ paddingLeft: appInfo.sizes.WIDTH * 0.5 }}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
           headerTintColor: appColors.primary,
           drawerActiveTintColor: appColors.primary,
 

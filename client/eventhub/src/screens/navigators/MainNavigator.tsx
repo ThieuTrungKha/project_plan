@@ -11,6 +11,9 @@ import DetailTask from "./../main/DetailTask";
 import UpdateTask from "../main/UpdateTask";
 import ChangePassword from "../auth/ChangePassword";
 import NewPassword from "../auth/NewPassword";
+import GroupScreen from "../main/GroupScreen";
+import AddMemberScreen from "../main/AddMemberScreen";
+import NotificationScreen from "./../main/NotificationScreen";
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -24,6 +27,9 @@ const MainNavigator = () => {
       <Stack.Screen name="UpdateTask" component={UpdateTask} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
       <Stack.Screen name="NewPassword" component={NewPassword} />
+      <Stack.Screen name="GroupScreen" component={GroupScreen} />
+      <Stack.Screen name="AddMemberScreen" component={AddMemberScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };

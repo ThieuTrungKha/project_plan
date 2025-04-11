@@ -10,7 +10,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { appInfo } from "../../constants/appInfo";
 import { appColors } from "../../constants/appColor";
 import Icon from "react-native-vector-icons/Ionicons";
-import SectionCOmponent from "../../components/SectionComponent";
 import RowComponent from "../../components/RowComponent";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import {
@@ -21,12 +20,14 @@ import {
 import Icon1 from "react-native-vector-icons/MaterialIcons";
 import { autoBatchEnhancer } from "@reduxjs/toolkit";
 import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import ClientService from "../../apis/service";
 import { useFocusEffect } from "@react-navigation/native";
-
+import IconFont from "react-native-vector-icons/FontAwesome";
+import { UserAdd } from "iconsax-react-native";
 interface listPlan {
   _id: string;
   planListName: string;
@@ -179,12 +180,28 @@ const DetailPlanScreen = ({ navigation }: any) => {
           </RowComponent>
           <RowComponent>
             <TouchableOpacity onPress={progress}>
-              <Icon
-                name="notifications"
-                size={24}
-                color={appColors.white}
-                style={{ paddingRight: 20 }}
-              />
+              <TouchableOpacity
+                style={{
+                  width: appInfo.sizes.WIDTH * 0.2,
+                  height: appInfo.sizes.HEIGHT * 0.04,
+                  backgroundColor: appColors.white,
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  navigation.navigate("GroupScreen", {
+                    planId: paramPlan.id,
+                    headerColor: paramPlan.photoUrlBackground,
+                  });
+                }}
+              >
+                <Ionicons
+                  name="person-add"
+                  size={14}
+                  color={appColors.primary}
+                />
+              </TouchableOpacity>
             </TouchableOpacity>
             <Icon1 name="more-vert" size={28} color={appColors.white} />
           </RowComponent>
