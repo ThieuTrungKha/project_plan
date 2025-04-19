@@ -19,6 +19,7 @@ import PlanApiService from "../../apis/service";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import RowComponent from "../../components/RowComponent";
 import IconMertial from "react-native-vector-icons/MaterialIcons";
+import ClientService from "../../apis/service";
 
 interface Plan {
   _id: string;
@@ -91,6 +92,7 @@ const ListPlan = ({ planData, isMember, navigation }: Props) => {
 const HomeScreens = ({ navigation }: any) => {
   const [planData, setPlanData] = useState<Plan[]>([]);
   const [reload, setReload] = useState<any>(null);
+  const [planShared, setplanShared] = useState<Plan[]>([]);
 
   const getDataPlan = async () => {
     try {
@@ -109,12 +111,25 @@ const HomeScreens = ({ navigation }: any) => {
       console.log("error check plan", error);
     }
   };
+  const getPlanByUser = async () => {
+    try {
+      const res = await ClientService.service(
+        "/permission/getPlansByUserParticipation",
+        undefined,
+        "get",
+      );
+      setplanShared(res.data);
+    } catch (error) {
+      console.log("error getting plan by user", error);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
       const checkData = async () => {
         await checkPlan();
         await getDataPlan();
+        await getPlanByUser();
       };
       checkData();
 
@@ -148,7 +163,11 @@ const HomeScreens = ({ navigation }: any) => {
           Danh sách kế hoạch đã tham gia:
         </Text>
         {/* Danh sách kế hoạch đã tham gia */}
-        <View></View>
+        <ListPlan
+          planData={planShared}
+          navigation={navigation}
+          isMember={true}
+        />
 
         <Text
           style={styles.sectionTitle}

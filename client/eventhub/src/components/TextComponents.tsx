@@ -8,12 +8,14 @@ interface Props {
   flex?: number;
   styles?: StyleProp<TextStyle>;
   title?: boolean;
+  testId?: string;
 }
 const TextComponents = (props: Props) => {
-  const { text, color, size, flex, styles, title } = props;
+  const { text, color, size, flex, styles, title, testId } = props;
   return (
     <View>
       <Text
+        testID={testId}
         numberOfLines={1}
         ellipsizeMode="tail"
         style={[

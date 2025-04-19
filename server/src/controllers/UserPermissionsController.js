@@ -162,6 +162,7 @@ const updateStatusInvitation = async (req, res) => {
     try {
         const { planId } = req.query
         const { email } = req.user
+
         if (!planId) {
             return res.status(400).json({ message: 'Missing planId' });
         }
@@ -202,6 +203,33 @@ const getJoinedPlan = async (req, res) => {
     }
 }
 
+const getPlansByUserParticipation = async (req, res) => {
+    const { email } = req.user
+    try {
+        const userPlanData = await InvitationModel.find({ emailMember: email, status: true });
+        const plans = [];
+        for (let i = 0; i < userPlanData.length; i++) {
+            const plan = await PlanModel.findById(userPlanData[i].planId);
+            if (!plan) {
+                console.log(`Plan not found for id: ${userPlanData[i].planId}`);
+                continue;
+            }
+            plans.push(plan);
+        }
+        if (plans.length === 0) {
+            return res.status(404).json({ message: 'No plans found for this user' });
+        }
+        return res.status(200).json({
+            message: 'Get plans successfully',
+            data: plans,
+        });
+    } catch (error) {
+        console.log('Error in getPlansByUserParticipation:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+
+    }
+}
+
 
 module.exports = {
     suggestion,
@@ -210,5 +238,6 @@ module.exports = {
     getInvitedPlanMembers,
     getDataAdmin,
     updateStatusInvitation,
-    getJoinedPlan
+    getJoinedPlan,
+    getPlansByUserParticipation
 }
