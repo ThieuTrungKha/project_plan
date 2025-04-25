@@ -7,7 +7,7 @@ export const appInfo = {
     HEIGHT: Dimensions.get("window").height,
     sizeMain: 24,
   },
-  BASE_URL: "http://192.168.81.113:3001",
+  BASE_URL: "http://192.168.1.12:3001",
   listColor: [
     appColors.primary,
     "#8BC34A", // Green

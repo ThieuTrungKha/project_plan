@@ -34,6 +34,7 @@ import { useRoute } from "@react-navigation/native";
 import axiosClient from "../../apis/axiosClient";
 import ClientService from "../../apis/service";
 import { registerForPushNotificationsAsync } from "../../service/notificationService";
+import { Feather } from "@expo/vector-icons";
 
 interface Task {
   content: string;

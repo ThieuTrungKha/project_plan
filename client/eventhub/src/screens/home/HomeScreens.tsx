@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   SafeAreaView,
   View,
@@ -34,6 +34,33 @@ interface Props {
   navigation: any;
 }
 const ListPlan = ({ planData, isMember, navigation }: Props) => {
+  const [isAdminOrMember, setIsAdminOrMember] = useState<string>();
+  const userPermissionRef = useRef<string | null>(null);
+
+  const checkUser = async (planId: any) => {
+    try {
+      const res = await ClientService.service(
+        `/permission/checkUser?planId=${planId}`,
+      );
+      const dataString: string = String(res.data);
+      userPermissionRef.current = dataString;
+    } catch (error) {
+      console.log("error check user", error);
+    }
+  };
+  const handleDetailPlanScreen = async (
+    planId: any,
+    planName: string,
+    photoUrlBackground: string,
+  ) => {
+    await checkUser(planId);
+    navigation.navigate("DetailPlanScreen", {
+      id: planId,
+      planName: planName,
+      photoUrlBackground: photoUrlBackground,
+      isAdminOrMember: userPermissionRef.current,
+    });
+  };
   return (
     <View style={styles.boardContainer}>
       {planData.map((plan) => (
@@ -44,11 +71,11 @@ const ListPlan = ({ planData, isMember, navigation }: Props) => {
             { backgroundColor: plan.photoUrlBackground },
           ]}
           onPress={() => {
-            navigation.navigate("DetailPlanScreen", {
-              id: plan._id,
-              planName: plan.planName,
-              photoUrlBackground: plan.photoUrlBackground,
-            });
+            handleDetailPlanScreen(
+              plan._id,
+              plan.planName,
+              plan.photoUrlBackground,
+            );
           }}
         >
           <RowComponent

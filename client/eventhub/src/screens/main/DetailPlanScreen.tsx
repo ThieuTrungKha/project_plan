@@ -58,7 +58,9 @@ const DetailPlanScreen = ({ navigation }: any) => {
     id: string;
     planName: string;
     photoUrlBackground: string;
+    isAdminOrMember: string;
   };
+  console.log("paramPlan", paramPlan);
   const [checked, setChecked] = useState(false);
   const [listName, setListName] = useState("");
   const [describe, setdescribe] = useState("");
@@ -129,7 +131,11 @@ const DetailPlanScreen = ({ navigation }: any) => {
       undefined,
       "get",
     );
-    navigation.navigate("UpdateTask", { task: res.data });
+    navigation.navigate("UpdateTask", {
+      task: res.data,
+      planId: paramPlan.id,
+      isAdminOrMember: paramPlan.isAdminOrMember,
+    });
   };
   const progress = (tasks: any) => {
     if (!tasks || tasks.length === 0) return 0;
@@ -180,30 +186,34 @@ const DetailPlanScreen = ({ navigation }: any) => {
           </RowComponent>
           <RowComponent>
             <TouchableOpacity onPress={progress}>
-              <TouchableOpacity
-                style={{
-                  width: appInfo.sizes.WIDTH * 0.2,
-                  height: appInfo.sizes.HEIGHT * 0.04,
-                  backgroundColor: appColors.white,
-                  borderRadius: 5,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => {
-                  navigation.navigate("GroupScreen", {
-                    planId: paramPlan.id,
-                    headerColor: paramPlan.photoUrlBackground,
-                  });
-                }}
-              >
-                <Ionicons
-                  name="person-add"
-                  size={14}
-                  color={appColors.primary}
-                />
-              </TouchableOpacity>
+              {paramPlan.isAdminOrMember === "admin" && (
+                <TouchableOpacity
+                  style={{
+                    width: appInfo.sizes.WIDTH * 0.2,
+                    height: appInfo.sizes.HEIGHT * 0.04,
+                    backgroundColor: appColors.white,
+                    borderRadius: 5,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    navigation.navigate("GroupScreen", {
+                      planId: paramPlan.id,
+                      headerColor: paramPlan.photoUrlBackground,
+                    });
+                  }}
+                >
+                  <Ionicons
+                    name="person-add"
+                    size={14}
+                    color={appColors.primary}
+                  />
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
-            <Icon1 name="more-vert" size={28} color={appColors.white} />
+            {paramPlan.isAdminOrMember === "admin" && (
+              <Icon1 name="more-vert" size={28} color={appColors.white} />
+            )}
           </RowComponent>
         </RowComponent>
       </View>
@@ -245,11 +255,13 @@ const DetailPlanScreen = ({ navigation }: any) => {
                       color: appColors.white,
                     }}
                   />
-                  <Icon1
-                    name="more-vert"
-                    size={30}
-                    color={appColors.textColor}
-                  />
+                  {paramPlan.isAdminOrMember === "admin" && (
+                    <Icon1
+                      name="more-vert"
+                      size={30}
+                      color={appColors.textColor}
+                    />
+                  )}
                 </RowComponent>
                 <Text style={{ color: appColors.gray, marginTop: 10 }}>
                   {list.planListDescription}
@@ -292,26 +304,28 @@ const DetailPlanScreen = ({ navigation }: any) => {
                     }}
                   />
                 </RowComponent>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("DetailTask", { id: list._id });
-                  }}
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: appColors.primary,
-                    width: appInfo.sizes.WIDTH * 0.76,
-                    height: appInfo.sizes.HEIGHT * 0.06,
-                    borderRadius: 5,
-                    marginTop: 10,
-                  }}
-                >
-                  <TextComponents
-                    text="Thêm nhiệm vụ"
-                    size={14}
-                    color={appColors.white}
-                  />
-                </TouchableOpacity>
+                {paramPlan.isAdminOrMember === "admin" && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("DetailTask", { id: list._id });
+                    }}
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: appColors.primary,
+                      width: appInfo.sizes.WIDTH * 0.76,
+                      height: appInfo.sizes.HEIGHT * 0.06,
+                      borderRadius: 5,
+                      marginTop: 10,
+                    }}
+                  >
+                    <TextComponents
+                      text="Thêm nhiệm vụ"
+                      size={14}
+                      color={appColors.white}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* nhiệm vụ */}
@@ -346,43 +360,45 @@ const DetailPlanScreen = ({ navigation }: any) => {
                       <RowComponent
                         stylles={{ marginTop: 10, alignItems: "center" }}
                       >
-                        <Pressable onPress={() => taskDataUpdated(task._id)}>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
+                        {paramPlan.isAdminOrMember === "admin" && (
+                          <Pressable onPress={() => taskDataUpdated(task._id)}>
                             <View
                               style={{
-                                width: 25,
-                                height: 25,
-                                borderRadius: 15,
+                                flexDirection: "row",
                                 alignItems: "center",
-                                borderColor: appColors.boderColor,
-                                justifyContent: "center",
-                                marginRight: 8,
-                                borderWidth: task.subTask ? 1 : 1,
-                                backgroundColor: task.statusTask
-                                  ? "#00C566"
-                                  : "white",
                               }}
                             >
-                              <Text
+                              <View
                                 style={{
-                                  color: "white",
-                                  fontSize: 20,
+                                  width: 25,
+                                  height: 25,
+                                  borderRadius: 15,
+                                  alignItems: "center",
+                                  borderColor: appColors.boderColor,
+                                  justifyContent: "center",
+                                  marginRight: 8,
+                                  borderWidth: task.subTask ? 1 : 1,
+                                  backgroundColor: task.statusTask
+                                    ? "#00C566"
+                                    : "white",
                                 }}
                               >
-                                <Icon1
-                                  name="check"
-                                  size={20}
-                                  color={task.statusTask ? "white" : ""}
-                                />
-                              </Text>
+                                <Text
+                                  style={{
+                                    color: "white",
+                                    fontSize: 20,
+                                  }}
+                                >
+                                  <Icon1
+                                    name="check"
+                                    size={20}
+                                    color={task.statusTask ? "white" : ""}
+                                  />
+                                </Text>
+                              </View>
                             </View>
-                          </View>
-                        </Pressable>
+                          </Pressable>
+                        )}
                         <View style={{ flex: 1 }}>
                           <Text style={{ fontWeight: 500, fontSize: 18 }}>
                             {task.taskInfo}
@@ -459,24 +475,26 @@ const DetailPlanScreen = ({ navigation }: any) => {
           );
         })}
         {/* Nút thêm danh sách */}
-        <TouchableOpacity
-          onPress={() => {
-            setIsShowList(true);
-          }}
-          style={{
-            backgroundColor: appColors.primary,
-            width: appInfo.sizes.WIDTH * 0.6,
-            height: appInfo.sizes.HEIGHT * 0.08,
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 10,
-            margin: 20,
-          }}
-        >
-          <Text style={{ color: appColors.white, fontWeight: 500 }}>
-            Thêm danh sách
-          </Text>
-        </TouchableOpacity>
+        {paramPlan.isAdminOrMember === "admin" && (
+          <TouchableOpacity
+            onPress={() => {
+              setIsShowList(true);
+            }}
+            style={{
+              backgroundColor: appColors.primary,
+              width: appInfo.sizes.WIDTH * 0.6,
+              height: appInfo.sizes.HEIGHT * 0.08,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 10,
+              margin: 20,
+            }}
+          >
+            <Text style={{ color: appColors.white, fontWeight: 500 }}>
+              Thêm danh sách
+            </Text>
+          </TouchableOpacity>
+        )}
         {/* from nhập thông tin danh sách */}
         {isShowList && (
           <View

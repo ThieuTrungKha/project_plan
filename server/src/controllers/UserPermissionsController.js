@@ -3,6 +3,8 @@ const InvitationModel = require('../model/invitationModel');
 const { createData, getOneDataById } = require('../service/crudService');
 const Plan = require('../model/planModel');
 const PlanModel = require('../model/planModel');
+const TaskModel = require('../model/taskModel');
+const { get } = require('mongoose');
 
 const suggestion = async (req, res) => {
     const { email } = req.query
@@ -229,7 +231,147 @@ const getPlansByUserParticipation = async (req, res) => {
 
     }
 }
+const getParticipantInfo = async (req, res) => {
+    const { planId } = req.query
+    try {
+        if (!planId) {
+            return res.status(400).json({ message: 'Missing planId' });
+        }
+        const planUsersWithStatusTrue = await InvitationModel.find({ planId: planId, status: true })
+        const participantInfo = []
+        for (let i = 0; i < planUsersWithStatusTrue.length; i++) {
+            const user = await User.findOne({ email: planUsersWithStatusTrue[i].emailMember })
+            if (!user) {
+                console.log(`User not found for id: ${planUsersWithStatusTrue[i].emailMember}`);
+                continue;
+            }
+            participantInfo.push({
+                emailMember: user.email,
+                username: user.username,
+            })
+        }
+        if (participantInfo.length === 0) {
+            return res.status(404).json({ message: 'No participants found for this plan' });
+        }
+        return res.status(200).json({
+            message: 'Get participants successfully',
+            data: participantInfo,
+        });
+    } catch (error) {
+        console.log('Error in getParticipantInfo:', error);
+        return res.status(500).json({ message: 'Internal server error' });
 
+    }
+}
+const addMemberTask = async (req, res) => {
+    const { emailMember, taskId } = req.body;
+    console.log('emailMember', emailMember)
+    console.log('taskId', taskId)
+    try {
+        if (!emailMember) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        if (!taskId) {
+            return res.status(400).json({ message: 'TaskId is required' });
+        }
+
+        const updatedTask = await TaskModel.findOneAndUpdate(
+            { _id: taskId },
+            { $addToSet: { memberTask: emailMember } },
+            { new: true }
+        );
+        const getListUser = await User.find({ email: { $in: updatedTask.memberTask } })
+        if (!getListUser) {
+            return res.status(404).json({ message: 'No user found' });
+        }
+
+        if (!updatedTask) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        return res.status(200).json({
+            message: 'Member added successfully',
+            data: getListUser,
+        });
+
+    } catch (error) {
+        console.error('Error in addMemberTask:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+const getMemberTask = async (req, res) => {
+    const { taskId } = req.query
+    try {
+        const listMemberTask = await TaskModel.findById(taskId)
+        if (!listMemberTask) {
+            return res.status(404).json({ message: 'No task found' });
+        }
+        const getListUser = await User.find({ email: { $in: listMemberTask.memberTask } })
+        if (!getListUser) {
+            return res.status(404).json({ message: 'No user found' });
+        }
+        return res.status(200).json({
+            message: 'Get member task successfully',
+            data: getListUser,
+        });
+
+    } catch (error) {
+        console.log('Error in getMemberTask:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+
+    }
+}
+const checkUser = async (req, res) => {
+    const { planId } = req.query
+    const { id } = req.user
+    console.log('id', id)
+    console.log('planId', planId)
+    try {
+        const findUserInPlan = await PlanModel.findOne({ _id: planId, idUser: id })
+        if (!findUserInPlan) {
+            return res.status(200).json({
+                message: 'You are the owner of this plan',
+                data: "member"
+            })
+        }
+        return res.status(200).json({
+            message: 'You are the owner of this plan',
+            data: "admin"
+        })
+    } catch (error) {
+        console.log('Error in checkUser:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+const checkUserTask = async (req, res) => {
+    console.log('--------------------checkUserTask')
+    const { taskId } = req.query
+    const { email } = req.user
+    console.log('taskId', taskId)
+    try {
+        if (!taskId) {
+            return res.status(400).json({ message: 'Missing taskId' });
+        }
+        const findMemberInTask = await TaskModel.findOne({ _id: taskId, memberTask: { $in: [email] } })
+        if (!findMemberInTask) {
+            return res.status(200).json({
+                message: 'You are not the member of this task',
+                data: "member"
+            })
+        } else {
+            return res.status(200).json({
+                message: 'You are the member of this task',
+                data: "memberTask"
+            })
+        }
+
+    } catch (error) {
+        console.log('Error in checkUserTask:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+
+    }
+}
 
 module.exports = {
     suggestion,
@@ -239,5 +381,10 @@ module.exports = {
     getDataAdmin,
     updateStatusInvitation,
     getJoinedPlan,
-    getPlansByUserParticipation
+    getPlansByUserParticipation,
+    getParticipantInfo,
+    addMemberTask,
+    getMemberTask,
+    checkUser,
+    checkUserTask
 }

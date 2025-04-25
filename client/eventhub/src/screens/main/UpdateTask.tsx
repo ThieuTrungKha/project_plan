@@ -11,8 +11,9 @@ import {
   Alert,
   Modal,
   StyleSheet,
+  FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { appInfo } from "../../constants/appInfo";
 import RowComponent from "../../components/RowComponent";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -34,17 +35,21 @@ import { useRoute } from "@react-navigation/native";
 import axiosClient from "../../apis/axiosClient";
 import ClientService from "../../apis/service";
 import * as FileSystem from "expo-file-system";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 interface Task {
   content: string;
   status: boolean;
 }
+interface Prop {
+  username: string;
+  emailMember: string;
+  isAdmin?: boolean;
+}
 
 const UpdateTask = ({ navigation }: any) => {
   const route = useRoute();
   const pramTask = route.params as any;
-
-  console.log(JSON.stringify(pramTask.task, null, 2));
 
   const [selectColor, setSelectColor] = useState(appColors.primary);
   const [disablesubTask, setdisablesubTask] = useState(true);
@@ -68,6 +73,12 @@ const UpdateTask = ({ navigation }: any) => {
   const [isShowDatePicker, setIsShowDatePicker] = useState(false);
   const [isShowTimePicker, setIsShowTimePicker] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
+  const [memberPlan, setmemberPlan] = useState<Prop[]>();
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [listMember, setListMember] = useState([]);
+  const [memberTask, setMemberTask] = useState();
+  const userPermissionRef = useRef<string | null>(null);
+
   const [file, setFile] = useState<{
     uri: string;
     name?: string;
@@ -88,7 +99,14 @@ const UpdateTask = ({ navigation }: any) => {
     pramTask.task.statusTask && setChecked(pramTask.task.statusTask);
   }, []);
 
+  const handleGetApi = async () => {
+    await checkUserTask();
+    await getMemberTask();
+  };
+
   useEffect(() => {
+    handleGetApi();
+
     setdisablesubTask(!subTask);
     setdisableNote(!noteValue);
     setdisableTask(!taskName);
@@ -201,6 +219,56 @@ const UpdateTask = ({ navigation }: any) => {
     setsubTaskList([...subTaskList, { content: subTask, status: false }]);
     setSubTask("");
   };
+  const getParticipantInfo = async () => {
+    try {
+      const res = await ClientService.service(
+        `/permission/getParticipantInfo?planId=${pramTask.planId}`,
+      );
+      setmemberPlan(res.data);
+    } catch (error) {
+      console.log("error get participant info", error);
+    }
+  };
+  const addMemberTask = async (email: string) => {
+    try {
+      const res = await ClientService.service(
+        "/permission/addMemberTask",
+        {
+          taskId: pramTask.task._id,
+          emailMember: email,
+        },
+        "post",
+      );
+      console.log("res add member task", res.data);
+      setListMember(res.data);
+    } catch (error) {
+      console.log("error add member task", error);
+    }
+  };
+  const getMemberTask = async () => {
+    try {
+      const res = await ClientService.service(
+        `/permission/getMemberTask?taskId=${pramTask.task._id}`,
+      );
+      setListMember(res.data);
+    } catch (error) {
+      console.log("error get member task", error);
+    }
+  };
+  const checkUserTask = async () => {
+    try {
+      if (pramTask.isAdminOrMember === "member") {
+        console.log("check user task", pramTask.task._id);
+        const res = await ClientService.service(
+          `/permission/checkUserTask?taskId=${pramTask.task._id}`,
+        );
+        const stringData: string = String(res.data);
+        userPermissionRef.current = stringData;
+      }
+    } catch (error) {
+      console.log("error check user task", error);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -224,7 +292,11 @@ const UpdateTask = ({ navigation }: any) => {
           >
             <RowComponent
               justify="space-between"
-              stylles={{ paddingVertical: 10, backgroundColor: selectColor }}
+              stylles={{
+                paddingVertical: 10,
+                backgroundColor: selectColor,
+                paddingHorizontal: 10,
+              }}
             >
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Icon
@@ -234,8 +306,29 @@ const UpdateTask = ({ navigation }: any) => {
                   style={{ alignItems: "center", justifyContent: "center" }}
                 />
               </TouchableOpacity>
+              {pramTask.isAdminOrMember === "admin" && (
+                <RowComponent>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setModalVisible(true);
+                      getParticipantInfo();
+                    }}
+                  >
+                    <IconMertial
+                      name="person-add"
+                      size={24}
+                      color={appColors.white}
+                      style={{ marginRight: 30 }}
+                    />
+                  </TouchableOpacity>
 
-              <IconMertial name="more-vert" size={24} color={appColors.white} />
+                  <IconMertial
+                    name="more-vert"
+                    size={24}
+                    color={appColors.white}
+                  />
+                </RowComponent>
+              )}
             </RowComponent>
             <TouchableOpacity
               onPress={pickImage}
@@ -367,6 +460,51 @@ const UpdateTask = ({ navigation }: any) => {
                 width: "100%",
               }}
             />
+          </View>
+          <View
+            style={{
+              backgroundColor: "#f1f5f9",
+              padding: 20,
+              margin: 16,
+              borderRadius: 16,
+              shadowColor: "#000",
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 3 },
+              elevation: 3,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+                color: "#1e293b",
+                marginBottom: 12,
+              }}
+            >
+              Danh sách thành viên
+            </Text>
+
+            {listMember.map((member: any, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    backgroundColor: "#fff",
+                    paddingVertical: 10,
+                    paddingHorizontal: 16,
+                    marginBottom: 10,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: "#e2e8f0",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, color: "#334155" }}>
+                    {member.username}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
 
           <View
@@ -672,29 +810,32 @@ const UpdateTask = ({ navigation }: any) => {
               );
             })}
             {/* lưu tất cả thông tin nhiệm vụ */}
-            <TouchableOpacity
-              onPress={updateTask}
-              disabled={disableTask}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 10,
-                backgroundColor: disableTask
-                  ? appColors.gray
-                  : appColors.primary,
-                borderRadius: 10,
-                marginBottom: 100,
-                marginTop: 40,
-                width: "100%",
-                height: appInfo.sizes.HEIGHT * 0.06,
-              }}
-            >
-              <TextComponents
-                text="Cập nhật nhiệm vụ"
-                color={appColors.white}
-                styles={{ fontWeight: 500 }}
-              />
-            </TouchableOpacity>
+            {(userPermissionRef.current === "memberTask" ||
+              pramTask.isAdminOrMember === "admin") && (
+              <TouchableOpacity
+                onPress={updateTask}
+                disabled={disableTask}
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 10,
+                  backgroundColor: disableTask
+                    ? appColors.gray
+                    : appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 100,
+                  marginTop: 40,
+                  width: "100%",
+                  height: appInfo.sizes.HEIGHT * 0.06,
+                }}
+              >
+                <TextComponents
+                  text="Cập nhật nhiệm vụ"
+                  color={appColors.white}
+                  styles={{ fontWeight: 500 }}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -786,6 +927,7 @@ const UpdateTask = ({ navigation }: any) => {
           </View>
         </View>
       </Modal>
+
       {isShowDatePicker && (
         <DateTimePicker
           value={date || new Date()}
@@ -802,6 +944,29 @@ const UpdateTask = ({ navigation }: any) => {
           onChange={handleTimeChange}
         />
       )}
+      <Modal visible={isModalVisible} transparent animationType="fade">
+        <View style={{ backgroundColor: appColors.white, padding: 20 }}>
+          <Text style={styles.title}>Danh sách thành viên kế hoạch</Text>
+          <FlatList
+            data={memberPlan}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.selectButton}
+                onPress={() => addMemberTask(item.emailMember)}
+              >
+                <Text>{item.username}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.cancelText}>Hủy</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -809,6 +974,12 @@ const UpdateTask = ({ navigation }: any) => {
 export default UpdateTask;
 
 const styles = StyleSheet.create({
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    maxHeight: "70%",
+  },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",

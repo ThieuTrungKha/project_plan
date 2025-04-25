@@ -13,10 +13,11 @@ import ClientService from "../../apis/service";
 interface Prop {
   username: string;
   email: string;
+  isAdmin?: boolean;
 }
 
 const InfoMember = (props: Prop) => {
-  const { username, email } = props;
+  const { username, email, isAdmin } = props;
   return (
     <RowComponent align="center" stylles={{ paddingRight: 10, marginTop: 20 }}>
       <View
@@ -37,7 +38,11 @@ const InfoMember = (props: Prop) => {
         />
         <TextComponents text={email} size={16} color={appColors.gray} />
       </View>
-      <TextComponents text="admin" size={16} color={appColors.gray} />
+      {isAdmin ? (
+        <TextComponents text="admin" size={16} color={appColors.gray} />
+      ) : (
+        <TextComponents text="member" size={16} color={appColors.gray} />
+      )}
     </RowComponent>
   );
 };
@@ -45,6 +50,7 @@ const InfoMember = (props: Prop) => {
 const GroupScreen = ({ navigation }: any) => {
   const route = useRoute();
   const [adminValue, setAdminValue] = useState<Prop>();
+  const [memberPlan, setmemberPlan] = useState<Prop[]>();
 
   const paramPlan = route.params as { planId: string; headerColor: string };
   const getInfoAdmin = async () => {
@@ -57,9 +63,20 @@ const GroupScreen = ({ navigation }: any) => {
       console.log("error get info admin", error);
     }
   };
+  const getParticipantInfo = async () => {
+    try {
+      const res = await ClientService.service(
+        `/permission/getParticipantInfo?planId=${paramPlan.planId}`,
+      );
+      setmemberPlan(res.data);
+    } catch (error) {
+      console.log("error get participant info", error);
+    }
+  };
 
   useEffect(() => {
     getInfoAdmin();
+    getParticipantInfo();
   }, []);
   return (
     <ScrollView style={{ flex: 1, backgroundColor: appColors.gray1 }}>
@@ -130,9 +147,19 @@ const GroupScreen = ({ navigation }: any) => {
           />
         </RowComponent>
         <InfoMember
+          isAdmin={true}
           username={adminValue?.username || ""}
           email={adminValue?.email || ""}
         />
+        {memberPlan?.map((item: Prop, index: number) => {
+          return (
+            <InfoMember
+              key={index}
+              username={item.username}
+              email={item.email}
+            />
+          );
+        })}
       </View>
     </ScrollView>
   );
